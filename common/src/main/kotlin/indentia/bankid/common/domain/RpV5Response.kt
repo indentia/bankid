@@ -6,6 +6,7 @@ import java.util.*
 class RpV5Response {
     data class AuthResponse(val orderRef: UUID, val autoStartToken: UUID)
     data class SignResponse(val orderRef: UUID, val autoStartToken: UUID)
+    data class CancelResponse(val dummy: String)
 
     data class CollectResponse(val orderRef: UUID, val status: CollectStatus, val hintCode: String? = null, val completionData: CompletionData? = null){
         data class CompletionData(val user: User, val device: Device, val cert: Cert, val signature: String, val ocspResponse: String)
@@ -25,6 +26,4 @@ class RpV5Response {
             }
         }
     }
-
-    data class CancelResponse(val dummy: String)
 }

@@ -1,6 +1,5 @@
 package indentia.bankid.mock.infrastructure.rest
 
-import indentia.bankid.common.domain.CertificatePolicy
 import indentia.bankid.common.domain.IPAddress
 import indentia.bankid.common.domain.PersonalNumber
 import indentia.bankid.common.domain.RpV5Request
@@ -45,8 +44,8 @@ class MockHelper {
             if (PersonalNumber::class.java.isAssignableFrom(attributeMetadata.pojoClass)) {
                 return PersonalNumber.random().value
             }
-            if (CertificatePolicy::class.java.isAssignableFrom(attributeMetadata.pojoClass)) {
-                return CertificatePolicy.random().value
+            if (RpV5Request.Requirement.CertificatePolicy::class.java.isAssignableFrom(attributeMetadata.pojoClass)) {
+                return RpV5Request.Requirement.CertificatePolicy.random().value
             }
             return super.getType(strategy, attributeMetadata, genericTypesArgumentsMap)
         }
