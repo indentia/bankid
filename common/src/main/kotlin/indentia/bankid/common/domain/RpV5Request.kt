@@ -5,7 +5,7 @@ import indentia.bankid.common.validated_value.RegexValidatedValue
 import org.apache.commons.lang3.RandomUtils
 import java.util.*
 
-class RpV5Request {
+object RpV5Request {
 
     data class AuthRequest(val endUserIp: IPAddress,
                            val personalNumber: PersonalNumber? = null,

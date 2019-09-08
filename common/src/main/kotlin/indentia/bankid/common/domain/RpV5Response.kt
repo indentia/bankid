@@ -3,7 +3,7 @@ package indentia.bankid.common.domain
 import com.fasterxml.jackson.annotation.JsonCreator
 import java.util.*
 
-class RpV5Response {
+object RpV5Response {
     data class AuthResponse(val orderRef: UUID, val autoStartToken: UUID)
     data class SignResponse(val orderRef: UUID, val autoStartToken: UUID)
     data class CancelResponse(val dummy: String)
