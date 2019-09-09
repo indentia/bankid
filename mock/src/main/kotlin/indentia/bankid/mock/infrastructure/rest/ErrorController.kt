@@ -9,6 +9,8 @@ import org.springframework.boot.web.servlet.error.DefaultErrorAttributes
 import org.springframework.boot.web.servlet.error.ErrorAttributes
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.status
+import org.springframework.http.converter.HttpMessageConversionException
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
@@ -16,6 +18,7 @@ import org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST
 import org.springframework.web.context.request.ServletRequestAttributes
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST
 
 @Controller
 @RequestMapping("\${server.error.path:\${error.path:/error}}")
@@ -38,18 +41,10 @@ class ErrorController @Autowired constructor(errorAttributes: ErrorAttributes, s
     }
 
     private fun produceJsonResponse(request: HttpServletRequest, errorAttributes: Map<String, Any>): ResponseEntity<ErrorResponse> {
-        val exception = extractException(request)
-
-        return if (exception is MockException) {
-            ResponseEntity
-                    .status(exception.httpStatus)
-                    .body(ErrorResponse(exception.code, exception?.message))
-        } else {
-            val status = errorAttributes["status"].toString()
-            val error = errorAttributes["error"].toString()
-            ResponseEntity
-                    .status(status.toInt())
-                    .body(ErrorResponse(errorCode = error))
+        return when (val exception = extractException(request)) {
+            is RpV5Exception -> status(exception.httpStatus).body(ErrorResponse(exception.code, exception.message!!))
+            is HttpMessageConversionException -> status(SC_BAD_REQUEST).body(ErrorResponse("badRequest", exception.message))
+            else -> status(errorAttributes["status"].toString().toInt()).body(ErrorResponse(errorAttributes["error"].toString()))
         }
     }
 
@@ -58,5 +53,9 @@ class ErrorController @Autowired constructor(errorAttributes: ErrorAttributes, s
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    data class ErrorResponse(val errorCode: String, val details: String? = null)
+    data class ErrorResponse(val errorCode: String, var details: String? = null) {
+        init {
+            details = details ?: errorCode
+        }
+    }
 }

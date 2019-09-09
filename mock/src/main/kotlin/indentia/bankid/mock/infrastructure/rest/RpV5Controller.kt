@@ -4,10 +4,8 @@ import indentia.bankid.common.domain.IPAddress
 import indentia.bankid.common.domain.RpV5Request
 import indentia.bankid.common.domain.RpV5Response
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
-import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.concurrent.ConcurrentHashMap
-import javax.servlet.http.HttpServletResponse.SC_OK
 
 @RestController()
 @RequestMapping(path = ["/rp/v5"])
@@ -33,21 +31,22 @@ class RpV5Controller {
     fun createAuthResponse(request: RpV5Request.Auth): RpV5Response.Auth {
         val authControlRequest = authControl[request.endUserIp]
 
-        val httpStatus = authControlRequest?.httpStatus ?: SC_OK
         val mockedResponse = authControlRequest?.mockedResponse
-        val responseBuilder = ResponseEntity.status(httpStatus)
-
-        return mockedResponse ?: randomOrErrorResponse(httpStatus, authControlRequest?.mockedErrorResponse)
+        return when {
+            (mockedResponse != null) -> mockedResponse
+            (authControlRequest?.error != null) -> throw rpV5Exception(authControlRequest.error)
+            else -> MockHelper.randomAuthResponse()
+        }
     }
 
-    private fun randomOrErrorResponse(builder: ResponseEntity.BodyBuilder, mockedErrorResponse: ErrorController.ErrorResponse?): RpV5Response.Auth {
-        return builder.body(mockedErrorResponse ?: randomAuthResponse())
+    private fun rpV5Exception(error: AuthControlRequest.Error): RpV5Exception {
+        return RpV5Exception(error.httpStatus, error.errorCode, error.details)
     }
-
-    private fun randomAuthResponse(): ResponseEntity<Any> = ResponseEntity.status(SC_OK).body(MockHelper.randomAuthResponse())
 
     data class AuthControlRequest(val endUserIp: IPAddress,
                                   val mockedResponse: RpV5Response.Auth? = null,
-                                  val httpStatus: Int?,
-                                  val mockedErrorResponse: ErrorController.ErrorResponse?)
+                                  val error: Error?) {
+
+        data class Error(val httpStatus: Int, val errorCode: String, val details: String)
+    }
 }
