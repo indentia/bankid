@@ -1,5 +1,6 @@
 package indentia.bankid.mock.infrastructure.rest
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.web.ErrorProperties
 import org.springframework.boot.autoconfigure.web.ServerProperties
@@ -15,15 +16,14 @@ import org.springframework.web.context.request.RequestAttributes.SCOPE_REQUEST
 import org.springframework.web.context.request.ServletRequestAttributes
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import javax.servlet.http.HttpServletResponse.SC_NOT_FOUND
 
 @Controller
 @RequestMapping("\${server.error.path:\${error.path:/error}}")
-class MockErrorController @Autowired constructor(errorAttributes: ErrorAttributes, serverProperties: ServerProperties) : AbstractErrorController(errorAttributes) {
+class ErrorController @Autowired constructor(errorAttributes: ErrorAttributes, serverProperties: ServerProperties) : AbstractErrorController(errorAttributes) {
     val errorProperties: ErrorProperties = serverProperties.error
 
     private val errorAttributeName = DefaultErrorAttributes::class.java.name + ".ERROR"
-    
+
     override fun getErrorPath(): String {
         return errorProperties.path
     }
@@ -40,15 +40,23 @@ class MockErrorController @Autowired constructor(errorAttributes: ErrorAttribute
     private fun produceJsonResponse(request: HttpServletRequest, errorAttributes: Map<String, Any>): ResponseEntity<ErrorResponse> {
         val exception = extractException(request)
 
-        return if ((exception != null) && MockException.NotFoundException::class.java.isAssignableFrom(exception::class.java)) {
-            ResponseEntity.status(SC_NOT_FOUND).body(ErrorResponse("notFound", "details"))
+        return if (exception is MockException) {
+            ResponseEntity
+                    .status(exception.httpStatus)
+                    .body(ErrorResponse(exception.code, exception?.message))
         } else {
-            val status = errorAttributes ["status"].toString()
-            ResponseEntity.status(status.toInt()).body(ErrorResponse(status, errorAttributes ["error"].toString()))
+            val status = errorAttributes["status"].toString()
+            val error = errorAttributes["error"].toString()
+            ResponseEntity
+                    .status(status.toInt())
+                    .body(ErrorResponse(errorCode = error))
         }
     }
 
     private fun extractException(request: HttpServletRequest): Exception? {
         return ServletRequestAttributes(request).getAttribute(errorAttributeName, SCOPE_REQUEST) as Exception?
     }
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    data class ErrorResponse(val errorCode: String, val details: String? = null)
 }

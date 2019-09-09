@@ -20,10 +20,10 @@ import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 
 @EnableWebMvc
-@SpringBootTest(classes = [MockControllerTest.Conf::class], webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-class MockControllerTest : AbstractTestNGSpringContextTests() {
+@SpringBootTest(classes = [RpV5ControllerTest.Conf::class], webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+class RpV5ControllerTest : AbstractTestNGSpringContextTests() {
 
-    @Import(MockController::class)
+    @Import(RpV5Controller::class)
     @Configuration
     class Conf {
     }

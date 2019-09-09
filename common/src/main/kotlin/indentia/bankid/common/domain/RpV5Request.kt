@@ -7,19 +7,19 @@ import java.util.*
 
 object RpV5Request {
 
-    data class AuthRequest(val endUserIp: IPAddress,
-                           val personalNumber: PersonalNumber? = null,
-                           val Requirement: Requirement? = null)
+    data class Auth(val endUserIp: IPAddress,
+                    val personalNumber: PersonalNumber? = null,
+                    val Requirement: Requirement? = null)
 
-    data class SignRequest(val endUserIp: IPAddress,
-                           val personalNumber: PersonalNumber?,
-                           val Requirement: Requirement?,
-                           val userVisibleData: Base64String?,
-                           val userNonVisibleData: Base64String?)
+    data class Sign(val endUserIp: IPAddress,
+                    val personalNumber: PersonalNumber?,
+                    val Requirement: Requirement?,
+                    val userVisibleData: Base64String?,
+                    val userNonVisibleData: Base64String?)
 
-    data class CollectRequest(val orderRef: UUID)
+    data class Collect(val orderRef: UUID)
 
-    data class CancelRequest(val orderRef: UUID)
+    data class Cancel(val orderRef: UUID)
 
     @Suppress("ArrayInDataClass")
     data class Requirement(val cardReader: CardReaderClass?,

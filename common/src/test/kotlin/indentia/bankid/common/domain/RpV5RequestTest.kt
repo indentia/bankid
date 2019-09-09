@@ -8,6 +8,6 @@ class RpV5RequestTest {
     @Test
     fun testFromJson() {
         val json = """{"endUserIp":"1.1.1.1", "personalNumber": "${PersonalNumber.random().value}"}"""
-        assertThat(jacksonObjectMapper().readValue(json, RpV5Request.AuthRequest::class.java)).isNotNull
+        assertThat(jacksonObjectMapper().readValue(json, RpV5Request.Auth::class.java)).isNotNull
     }
 }

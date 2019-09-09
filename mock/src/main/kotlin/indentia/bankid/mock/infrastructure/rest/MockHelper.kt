@@ -3,7 +3,7 @@ package indentia.bankid.mock.infrastructure.rest
 import indentia.bankid.common.domain.IPAddress
 import indentia.bankid.common.domain.PersonalNumber
 import indentia.bankid.common.domain.RpV5Request
-import indentia.bankid.common.domain.RpV5Response.AuthResponse
+import indentia.bankid.common.domain.RpV5Response
 import uk.co.jemos.podam.api.AttributeMetadata
 import uk.co.jemos.podam.api.DataProviderStrategy
 import uk.co.jemos.podam.api.PodamFactory
@@ -14,12 +14,12 @@ import kotlin.reflect.KClass
 
 class MockHelper {
     companion object {
-        fun randomAuthResponse(): AuthResponse {
-            return manufacturePojo(AuthResponse::class)
+        fun randomAuthResponse(): RpV5Response.Auth {
+            return manufacturePojo(RpV5Response.Auth::class)
         }
 
-        fun randomAuthRequest(): RpV5Request.AuthRequest {
-            return manufacturePojo(RpV5Request.AuthRequest::class)
+        fun randomAuthRequest(): RpV5Request.Auth {
+            return manufacturePojo(RpV5Request.Auth::class)
         }
 
         private fun <T : Any> manufacturePojo(kClass: KClass<T>): T {

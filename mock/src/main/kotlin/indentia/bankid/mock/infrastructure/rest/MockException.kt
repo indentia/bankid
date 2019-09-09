@@ -1,12 +1,9 @@
 package indentia.bankid.mock.infrastructure.rest
 
-import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.ResponseStatus
+import javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR
+import javax.servlet.http.HttpServletResponse.SC_NOT_FOUND
 
-open class MockException : RuntimeException() {
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    class InternalServerErrorException : MockException()
-
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    class NotFoundException : MockException()
+open class MockException(val httpStatus: Int, val code: String, message: String) : RuntimeException(message) {
+    class InternalErrorException(message: String) : MockException(SC_INTERNAL_SERVER_ERROR, "internalError", message)
+    class NotFoundException(message: String) : MockException(SC_NOT_FOUND, "notFound", message)
 }
